@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人简历 - 臻驱科技LEDP-ETR</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+            background: #f5f6f7;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 50px 60px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 3px solid #1a5f9e;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .name-section h1 {
+            font-size: 32px;
+            color: #1a5f9e;
+            letter-spacing: 2px;
+        }
+        .target-job {
+            display: inline-block;
+            background: #e8f4fd;
+            color: #1a5f9e;
+            padding: 4px 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 8px;
+            font-weight: 600;
+        }
+        .contact-info {
+            text-align: right;
+            font-size: 14px;
+            color: #555;
+            line-height: 2;
+        }
+        .contact-info span {
+            display: block;
+        }
+        .section {
+            margin-bottom: 22px;
+        }
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a5f9e;
+            border-left: 4px solid #1a5f9e;
+            padding-left: 10px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .edu-item {
+            margin-bottom: 8px;
+        }
+        .edu-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 15px;
+        }
+        .edu-detail {
+            font-size: 14px;
+            color: #555;
+            margin-top: 3px;
+        }
+        .skills-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px 30px;
+            font-size: 14px;
+        }
+        .skills-grid li {
+            list-style: none;
+            position: relative;
+            padding-left: 14px;
+        }
+        .skills-grid li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #1a5f9e;
+            font-weight: bold;
+        }
+        .project-item {
+            margin-bottom: 14px;
+        }
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            font-size: 15px;
+            color: #222;
+        }
+        .project-role {
+            font-size: 13px;
+            color: #1a5f9e;
+            font-weight: 600;
+            margin: 2px 0 4px 0;
+        }
+        .project-desc {
+            font-size: 14px;
+            color: #444;
+            text-align: justify;
+        }
+        .project-desc ul {
+            padding-left: 18px;
+            margin-top: 4px;
+        }
+        .project-desc li {
+            margin-bottom: 3px;
+        }
+        .highlight {
+            color: #1a5f9e;
+            font-weight: 600;
+        }
+        .tag {
+            display: inline-block;
+            background: #f0f7ff;
+            color: #1a5f9e;
+            padding: 1px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-right: 6px;
+            border: 1px solid #d0e3f7;
+        }
+        .award-item {
+            font-size: 14px;
+            margin-bottom: 4px;
+            padding-left: 14px;
+            position: relative;
+        }
+        .award-item::before {
+            content: "🏆";
+            position: absolute;
+            left: -4px;
+        }
+        .footer-note {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            margin-top: 30px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+        }
+        @media print {
+            body { background: #fff; }
+            .container { box-shadow: none; margin: 0; padding: 30px 40px; }
+            .footer-note { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部信息 -->
+        <div class="header">
+            <div class="name-section">
+                <h1>你的姓名</h1>
+                <div class="target-job">🎯 意向：臻驱科技 LEDP-ETR 卓越工程师（暑期实习）</div>
+            </div>
+            <div class="contact-info">
+                <span>📱 138-xxxx-xxxx</span>
+                <span>📧 yourname@email.com</span>
+                <span>🎓 XX大学 · 电气工程 · 硕士</span>
+                <span>📅 2027年6月毕业</span>
+            </div>
+        </div>
+
+        <!-- 教育背景 -->
+        <div class="section">
+            <div class="section-title">教育背景</div>
+            <div class="edu-item">
+                <div class="edu-header">
+                    <span>XX大学（985/211/双一流）</span>
+                    <span>20XX.09 - 20XX.06</span>
+                </div>
+                <div class="edu-detail">
+                    硕士/本科 · 电气工程学院 · 电力电子与电力传动专业 · GPA: X.XX/4.0（前X%）<br>
+                    <span class="tag">国家奖学金</span>
+                    <span class="tag">一等学业奖学金</span>
+                    <span class="tag">优秀毕业生</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 专业技能 -->
+        <div class="section">
+            <div class="section-title">专业技能</div>
+            <ul class="skills-grid">
+                <li><span class="highlight">功率半导体</span>：熟悉 IGBT / SiC MOSFET / GaN 器件特性与驱动保护</li>
+                <li><span class="highlight">电机控制</span>：掌握 PMSM/BLDC 矢量控制(FOC)、SVPWM、无感控制</li>
+                <li><span class="highlight">电力电子</span>：熟悉逆变器、DC-DC、OBC、充电桩等拓扑设计与调试</li>
+                <li><span class="highlight">仿真工具</span>：MATLAB/Simulink、PLECS、LTspice、Saber</li>
+                <li><span class="highlight">嵌入式开发</span>：STM32 / TI C2000 DSP，C/C++，CAN/LIN 总线协议</li>
+                <li><span class="highlight">硬件设计</span>：Altium Designer / Cadence，原理图设计与 PCB Layout</li>
+                <li><span class="highlight">测试验证</span>：示波器、功率分析仪、HIL 硬件在环、双脉冲测试</li>
+                <li><span class="highlight">其他</span>：Python 数据处理、电磁兼容(EMC)基础、热管理设计</li>
+            </ul>
+        </div>
+
+        <!-- 项目经历 -->
+        <div class="section">
+            <div class="section-title">项目经历（核心！）</div>
+            
+            <div class="project-item">
+                <div class="project-header">
+                    <span>基于 SiC MOSFET 的新能源汽车电机控制器设计</span>
+                    <span>20XX.XX - 20XX.XX</span>
+                </div>
+                <div class="project-role">项目负责人 | 导师：XXX教授</div>
+                <div class="project-desc">
+                    针对新能源汽车 800V 高压平台，研发高效率、高功率密度电机控制器。
+                    <ul>
+                        <li>完成 <span class="highlight">SiC MOSFET</span> 器件选型与双脉冲测试，建立开关损耗与导通损耗模型</li>
+                        <li>设计基于 <span class="highlight">STM32F4 + FPGA</span> 的硬件架构，实现栅极驱动与多重保护（过流/过压/短路）</li>
+                        <li>在 <span class="highlight">MATLAB/Simulink</span> 中搭建 PMSM 矢量控制模型，自动生成 C 代码并移植至 DSP</li>
+                        <li>台架测试验证：峰值功率 <span class="highlight">XX kW</span>，最高效率 <span class="highlight">>98%</span>，功率密度 <span class="highlight">XX kW/L</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="project-item">
+                <div class="project-header">
+                    <span>eVTOL 电动飞机无刷电机驱动系统（电调 ESC）开发</span>
+                    <span>20XX.XX - 20XX.XX</span>
+                </div>
+                <div class="project-role">核心成员 | 负责硬件与嵌入式控制</div>
+                <div class="project-desc">
+                    为小型四旋翼 eVTOL 设计高可靠性电推进驱动模块。
+                    <ul>
+                        <li>基于 <span class="highlight">STM32G4</span> 设计三相无感 BLDC 驱动电路，采用反电势过零检测实现无感控制</li>
+                        <li>编写嵌入式程序实现启动策略、调速、制动及故障保护，代码通过 MIL 标准审查</li>
+                        <li>利用 <span class="highlight">PLECS</span> 仿真验证热特性，优化铝基板散热方案，降低温升 15%</li>
+                        <li>配合飞控完成联调，实现 10kg 级飞行器稳定悬停，续航提升约 <span class="highlight">15%</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="project-item">
+                <div class="project-header">
+                    <span>协作机器人关节伺服驱动器设计</span>
+                    <span>20XX.XX - 20XX.XX</span>
+                </div>
+                <div class="project-role">独立负责 | 校企合作项目</div>
+                <div class="project-desc">
+                    设计 48V 低压大电流关节伺服驱动器，满足具身智能机器人关节模组需求。
+                    <ul>
+                        <li>完成驱动器硬件设计：48V/20A 输出，集成制动电阻、绝对值/增量编码器接口</li>
+                        <li>实现 <span class="highlight">FOC 电流环</span>（带宽 >1kHz），加入转矩前馈与谐振抑制算法</li>
+                        <li>通过 <span class="highlight">CAN 总线</span>与上层控制器通信，实现 1kHz 实时位置/力矩控制</li>
+                        <li>位置跟踪精度达 <span class="highlight">±0.01°</span>，满足机器人关节低速大扭矩、高动态响应要求</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 竞赛与荣誉 -->
+        <div class="section">
+            <div class="section-title">竞赛与荣誉</div>
+            <div class="award-item">全国大学生电子设计竞赛 — 省级一等奖（作品：双向DC-DC变换器）</div>
+            <div class="award-item">中国研究生电子设计竞赛 — 全国三等奖（作品：SiC 车载充电机）</div>
+            <div class="award-item">XX大学 "学术之星" / 优秀研究生干部 / 学业一等奖学金</div>
+        </div>
+
+        <!-- 科研论文（可选） -->
+        <div class="section">
+            <div class="section-title">科研成果</div>
+            <div class="project-desc" style="font-size:14px;">
+                [1] <b>你的姓名</b> 等. 基于 SiC 的电动汽车电机控制器损耗优化研究[J]. 《电力电子技术》, 20XX.<br>
+                [2] 发明专利：一种用于 eVTOL 的电调短路保护电路，公开号 CNXXXXXXXXXX.
+            </div>
+        </div>
+
+        <!-- 自我评价 -->
+        <div class="section">
+            <div class="section-title">自我评价</div>
+            <div class="project-desc" style="font-size:14px;">
+                具备扎实的电力电子与电机控制理论基础，对 <span class="highlight">IGBT/SiC 功率半导体器件</span>有深入理解。拥有从电路仿真、硬件设计到嵌入式控制、台架测试的<span class="highlight">完整项目闭环经验</span>，熟悉新能源汽车电驱、eVTOL 电推进、机器人伺服等应用场景。热爱硬科技，渴望在国产功率半导体与新能源电驱领域深耕，希望加入臻驱科技，与团队一起推动前沿技术的产品化落地。
+            </div>
+        </div>
+
+        <div class="footer-note">
+            本简历针对臻驱科技 LEDP-ETR 卓越工程师项目定制优化 | 请根据实际情况修改内容
+        </div>
+    </div>
+</body>
+</html>
