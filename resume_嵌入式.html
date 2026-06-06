@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>个人简历 - 可编辑版</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", "Segoe UI", sans-serif;
+            background: #e8edf2;
+            color: #333;
+            line-height: 1.5;
+            padding: 20px;
+        }
+        .tip-banner {
+            background: #2c4a6b;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+        }
+        .tip-banner kbd {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        /* 溢出警告条 */
+        .overflow-warning {
+            display: none;
+            background: #dc3545;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .overflow-warning.show {
+            display: block;
+        }
+        /* A4预览容器 */
+        .a4-wrapper {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        /* A4高度限制指示线 */
+        .a4-height-marker {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 297mm;
+            height: 2px;
+            background: repeating-linear-gradient(
+                90deg,
+                #dc3545,
+                #dc3545 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            z-index: 10;
+            pointer-events: none;
+            display: none;
+        }
+        .a4-height-marker.show {
+            display: block;
+        }
+        /* 顶部标题栏 */
+        .top-header {
+            background: #2c4a6b;
+            color: #fff;
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-shrink: 0;
+        }
+        .top-header h1 {
+            font-size: calc(34px * var(--font-scale, 1));
+            font-weight: bold;
+            letter-spacing: 4px;
+            outline: none;
+        }
+        .top-header .divider {
+            width: 2px;
+            height: 48px;
+            background: rgba(255,255,255,0.4);
+        }
+        .top-header .subtitle {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .top-header .subtitle .en {
+            font-size: calc(15px * var(--font-scale, 1));
+            letter-spacing: 2px;
+            outline: none;
+        }
+        .top-header .subtitle .slogan {
+            font-size: calc(12px * var(--font-scale, 1));
+            color: rgba(255,255,255,0.8);
+            outline: none;
+        }
+        /* 内容区域 - 自动填充剩余空间 */
+        .content {
+            padding: 16px 40px 20px 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        /* 板块标题 */
+        .section-title-bar {
+            background: #2c4a6b;
+            color: #fff;
+            display: inline-block;
+            padding: 3px 16px;
+            font-size: calc(14px * var(--font-scale, 1));
+            font-weight: bold;
+            margin-bottom: 8px;
+            outline: none;
+        }
+        .section {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 8px;
+            flex-shrink: 0;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        /* 基本信息 */
+        .basic-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        .basic-info-left {
+            flex: 1;
+        }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: calc(13px * var(--font-scale, 1));
+        }
+        .info-table td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+        .info-table .info-label {
+            width: 70px;
+            color: #333;
+            text-align: justify;
+            text-align-last: justify;
+            white-space: nowrap;
+            outline: none;
+        }
+        .info-table .info-sep {
+            width: 18px;
+            text-align: center;
+        }
+        .info-table .info-value {
+            width: 180px;
+            color: #333;
+            outline: none;
+        }
+        .info-table .info-gap {
+            width: 35px;
+        }
+        .photo-area {
+            width: 90px;
+            height: 115px;
+            border: 1px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: calc(11px * var(--font-scale, 1));
+            text-align: center;
+            margin-left: 18px;
+            background: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        .photo-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .photo-placeholder {
+            position: absolute;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .photo-area.has-photo .photo-placeholder {
+            display: none;
+        }
+        /* 教育背景 */
+        .edu-table {
+            width: 100%;
+            font-size: calc(13px * var(--font-scale, 1));
+            border-collapse: collapse;
+        }
+        .edu-table td {
+            padding: 4px 0;
+            font-weight: bold;
+            outline: none;
+        }
+        .edu-table .edu-time {
+            width: 28%;
+        }
+        .edu-table .edu-school {
+            width: 44%;
+            text-align: center;
+        }
+        .edu-table .edu-major {
+            width: 28%;
+            text-align: right;
+        }
+        /* 项目经验 */
+        .project-item {
+            margin-bottom: 8px;
+        }
+        .project-item:last-child {
+            margin-bottom: 0;
+        }
+        .project-name {
+            font-size: calc(13px * var(--font-scale, 1));
+            font-weight: bold;
+            color: #2c4a6b;
+            margin-bottom: 4px;
+            outline: none;
+        }
+        .project-desc-list {
+            padding-left: 16px;
+            font-size: calc(12px * var(--font-scale, 1));
+            color: #444;
+            line-height: 1.5;
+        }
+        .project-desc-list li {
+            margin-bottom: 2px;
+            outline: none;
+        }
+        /* 校园经历 */
+        .exp-name {
+            font-size: calc(13px * var(--font-scale, 1));
+            font-weight: bold;
+            color: #2c4a6b;
+            margin-bottom: 4px;
+            outline: none;
+        }
+        .exp-list {
+            padding-left: 16px;
+            font-size: calc(12px * var(--font-scale, 1));
+            color: #444;
+            line-height: 1.5;
+        }
+        .exp-list li {
+            margin-bottom: 2px;
+            outline: none;
+        }
+        /* 技能/英语水平 */
+        .skills-list {
+            padding-left: 16px;
+            font-size: calc(12px * var(--font-scale, 1));
+            color: #444;
+            line-height: 1.5;
+        }
+        .skills-list li {
+            margin-bottom: 2px;
+            outline: none;
+        }
+        /* 编辑时的视觉反馈 */
+        [contenteditable="true"]:hover {
+            background: rgba(44, 74, 107, 0.05);
+            cursor: text;
+        }
+        [contenteditable="true"]:focus {
+            background: rgba(44, 74, 107, 0.08);
+            border-radius: 3px;
+        }
+        /* 空列表项隐藏 */
+        .project-desc-list li:empty,
+        .exp-list li:empty,
+        .skills-list li:empty {
+            display: none;
+        }
+        /* 保存按钮栏 */
+        .save-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 1000;
+            flex-wrap: wrap;
+            max-width: 400px;
+            justify-content: flex-end;
+        }
+        .save-bar button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .save-bar button:hover { opacity: 0.85; transform: translateY(-1px); }
+        .save-bar .btn-save { background: #2c4a6b; color: #fff; }
+        .save-bar .btn-load { background: #e8edf2; color: #2c4a6b; }
+        .save-bar .btn-export { background: #28a745; color: #fff; }
+        .save-bar .btn-pdf { background: #dc3545; color: #fff; }
+        .save-bar .btn-png { background: #6f42c1; color: #fff; }
+        .font-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 10px;
+        }
+        .font-control label {
+            font-size: 13px;
+            color: #333;
+        }
+        .font-control input[type="range"] {
+            width: 100px;
+        }
+        .font-control span {
+            font-size: 13px;
+            color: #666;
+            min-width: 40px;
+        }
+        .save-status {
+            font-size: 13px;
+            margin-left: 8px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+        .save-status.show { opacity: 1; }
+        .save-status.success { color: #28a745; }
+        .save-status.warning { color: #f0ad4e; }
+        /* 打印/导出模式：强制A4 */
+        @media print {
+            body { background: #fff; padding: 0; }
+            .tip-banner { display: none !important; }
+            .save-bar { display: none !important; }
+            .overflow-warning { display: none !important; }
+            .a4-height-marker { display: none !important; }
+            .a4-wrapper {
+                width: 210mm !important;
+                height: 297mm !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+                border-radius: 0 !important;
+                overflow: hidden !important;
+            }
+            [contenteditable="true"] { background: transparent !important; }
+        }
+        @page {
+            size: A4;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="tip-banner">
+        💡 <b>可直接编辑</b>：点击文字修改 → 点击照片区域按Ctrl+V粘贴头像 → Ctrl+P打印为PDF
+    </div>
+
+    <!-- 溢出警告 -->
+    <div class="overflow-warning" id="overflowWarning">
+        ⚠️ 内容已超出A4页面范围！请删除部分内容。
+    </div>
+
+    <!-- A4预览容器 -->
+    <div class="a4-wrapper" id="a4Wrapper">
+        <!-- A4高度标记线 -->
+        <div class="a4-height-marker" id="a4HeightMarker"></div>
+        
+        <!-- 顶部标题栏 -->
+        <div class="top-header">
+            <h1 contenteditable="true">个人简历</h1>
+            <div class="divider"></div>
+            <div class="subtitle">
+                <div class="en" contenteditable="true">PERSONAL RESUME</div>
+                <div class="slogan" contenteditable="true">我一直在努力成为更好的自己</div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- 基本信息 -->
+            <div class="section">
+                <div class="section-title-bar" contenteditable="true">基本信息</div>
+                <div class="basic-info">
+                    <div class="basic-info-left">
+                        <table class="info-table">
+                            <tr>
+                                <td class="info-label" contenteditable="true">姓　　名</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">崔良贵</td>
+                                <td class="info-gap"></td>
+                                <td class="info-label" contenteditable="true">求职岗位</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">硬件研发实习生</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label" contenteditable="true">联系电话</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">18269789361</td>
+                                <td class="info-gap"></td>
+                                <td class="info-label" contenteditable="true">邮　　箱</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">2265178346@qq.com</td>
+                            </tr>
+                            <tr>
+                                <td class="info-label" contenteditable="true">年　　龄</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">24</td>
+                                <td class="info-gap"></td>
+                                <td class="info-label" contenteditable="true">性　　别</td>
+                                <td class="info-sep">：</td>
+                                <td class="info-value" contenteditable="true">男</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="photo-area" id="photoArea" contenteditable="true">
+                        <div class="photo-placeholder">点击粘贴<br>照片</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 教育背景 -->
+            <div class="section">
+                <div class="section-title-bar" contenteditable="true">教育背景</div>
+                <table class="edu-table">
+                    <tr>
+                        <td class="edu-time" contenteditable="true">2020-09 ~ 2024-06</td>
+                        <td class="edu-school" contenteditable="true">合肥工业大学</td>
+                        <td class="edu-major" contenteditable="true">自动化</td>
+                    </tr>
+                    <tr>
+                        <td class="edu-time" contenteditable="true">2024-09 ~ 2027-06</td>
+                        <td class="edu-school" contenteditable="true">合肥工业大学</td>
+                        <td class="edu-major" contenteditable="true">控制科学与工程</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- 项目经验 -->
+            <div class="section">
+                <div class="section-title-bar" contenteditable="true">项目经验</div>
+                
+                <div class="project-item">
+                    <div class="project-name" contenteditable="true">基于STM32的电机驱动控制系统硬件设计</div>
+                    <ul class="project-desc-list">
+                        <li contenteditable="true">硬件方案设计：完成永磁同步电机（PMSM）驱动控制板的方案设计，包括主控STM32F407、预驱动芯片、MOSFET功率级、电源模块选型。</li>
+                        <li contenteditable="true">原理图与PCB设计：使用Altium Designer绘制驱动电路原理图，完成PCB布局布线，重点处理功率回路、栅极驱动、电流采样等关键信号完整性。</li>
+                        <li contenteditable="true">驱动电路调试：独立完成三相逆变桥驱动、SVPWM调制、电流环PI参数整定，台架测试空载/带载运行，电机转速控制精度±1%。</li>
+                        <li contenteditable="true">硬件测试验证：使用示波器、万用表、电子负载完成电源纹波、开关波形、温升测试，整理测试数据并输出硬件调试报告。</li>
+                    </ul>
+                </div>
+
+                <div class="project-item">
+                    <div class="project-name" contenteditable="true">基于ARM Cortex-M4的BMS电池管理系统硬件开发</div>
+                    <ul class="project-desc-list">
+                        <li contenteditable="true">BMS硬件架构设计：设计12串锂电池管理系统的硬件架构，包括AFE前端采样、均衡电路、主控MCU、CAN通信、继电器驱动等模块。</li>
+                        <li contenteditable="true">模拟前端设计：使用TI BQ76940 AFE芯片完成单体电压、温度、总压、电流采样，设计被动均衡电路，均衡电流100mA。</li>
+                        <li contenteditable="true">嵌入式软硬件联调：配合软件工程师完成SOC估算、过充过放保护、温度保护逻辑验证，通过CAN总线上传电池状态至整车控制器。</li>
+                        <li contenteditable="true">研发文档输出：编写BMS硬件设计说明书、BOM清单、测试用例、故障分析记录，建立硬件研发体系文档模板。</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 校园经历 -->
+            <div class="section">
+                <div class="section-title-bar" contenteditable="true">校园经历</div>
+                <div class="exp-name" contenteditable="true">硬件研发助理实习</div>
+                <ul class="exp-list">
+                    <li contenteditable="true">协助完成电源模块、驱动电路的原理图绘制与PCB Layout，使用Altium Designer输出Gerber文件并对接板厂打样。</li>
+                    <li contenteditable="true">参与硬件台架调试与问题排查，使用示波器抓取电源启动波形、MOSFET开关波形，记录测试数据并协助完成调试报告。</li>
+                </ul>
+            </div>
+
+            <!-- 技能/英语水平 -->
+            <div class="section">
+                <div class="section-title-bar" contenteditable="true">技能/英语水平</div>
+                <ul class="skills-list">
+                    <li contenteditable="true">硬件设计基础：掌握模电、数电、电力电子基础理论，熟悉硬件设计流程，具备电路分析、器件选型、原理图设计能力。</li>
+                    <li contenteditable="true">PCB设计：熟练使用Altium Designer进行原理图绘制与PCB Layout，了解信号完整性、EMC、热设计等基础概念。</li>
+                    <li contenteditable="true">嵌入式硬件：熟悉STM32系列MCU硬件设计，掌握电源、ADC、PWM、CAN、UART等常用接口电路设计。</li>
+                    <li contenteditable="true">调试测试：熟练使用示波器、万用表、电子负载、逻辑分析仪等仪器，具备硬件问题定位与调试能力。</li>
+                    <li contenteditable="true">文档与协作：具备良好的技术文档编写能力，善于团队协作，英语CET6，能阅读英文数据手册与技术规范。</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- 保存/加载/导出按钮 -->
+    <div class="save-bar" id="saveBar">
+        <div class="font-control">
+            <label>字体大小</label>
+            <input type="range" id="fontScale" min="0.8" max="1.3" step="0.05" value="1">
+            <span id="fontScaleValue">100%</span>
+        </div>
+        <button class="btn-save" onclick="saveResume()">💾 保存</button>
+        <button class="btn-load" onclick="loadResume()">📂 加载</button>
+        <button class="btn-export" onclick="exportHTML()">📄 HTML</button>
+        <button class="btn-pdf" onclick="exportPDF()">📕 PDF</button>
+        <button class="btn-png" onclick="exportPNG()">🖼️ PNG</button>
+        <span class="save-status" id="saveStatus"></span>
+    </div>
+
+    <script>
+        const photoArea = document.getElementById('photoArea');
+        const a4Wrapper = document.getElementById('a4Wrapper');
+        const overflowWarning = document.getElementById('overflowWarning');
+        const a4HeightMarker = document.getElementById('a4HeightMarker');
+        const fontScaleSlider = document.getElementById('fontScale');
+        const fontScaleValue = document.getElementById('fontScaleValue');
+        
+        // A4高度（像素，按96dpi计算）
+        const A4_HEIGHT_PX = 297 * 3.779527559;
+        
+        // 字体缩放
+        fontScaleSlider.addEventListener('input', function() {
+            const scale = this.value;
+            document.documentElement.style.setProperty('--font-scale', scale);
+            fontScaleValue.textContent = Math.round(scale * 100) + '%';
+            setTimeout(checkOverflow, 100);
+        });
+        
+        // 清理空列表项
+        function cleanEmptyItems() {
+            document.querySelectorAll('.project-desc-list li, .exp-list li, .skills-list li').forEach(li => {
+                if (!li.textContent.trim()) {
+                    li.remove();
+                }
+            });
+        }
+        
+        // 检查内容是否溢出A4
+        function checkOverflow() {
+            cleanEmptyItems();
+            
+            const contentHeight = a4Wrapper.getBoundingClientRect().height;
+            const isOverflow = contentHeight > A4_HEIGHT_PX;
+            
+            if (isOverflow) {
+                overflowWarning.classList.add('show');
+                a4HeightMarker.classList.add('show');
+                a4Wrapper.style.border = '2px solid #dc3545';
+            } else {
+                overflowWarning.classList.remove('show');
+                a4HeightMarker.classList.remove('show');
+                a4Wrapper.style.border = 'none';
+            }
+            
+            return isOverflow;
+        }
+        
+        // 监听所有可编辑元素的输入
+        document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+            el.addEventListener('input', function() {
+                checkOverflow();
+                autoSave();
+            });
+            
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    setTimeout(checkOverflow, 0);
+                }
+            });
+        });
+        
+        window.addEventListener('resize', checkOverflow);
+        
+        // 照片粘贴功能
+        photoArea.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const blob = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        photoArea.innerHTML = '';
+                        const img = document.createElement('img');
+                        img.src = event.target.result;
+                        photoArea.appendChild(img);
+                        photoArea.classList.add('has-photo');
+                        checkOverflow();
+                        autoSave();
+                    };
+                    reader.readAsDataURL(blob);
+                    break;
+                }
+            }
+        });
+
+        photoArea.addEventListener('focus', function() {
+            if (!photoArea.classList.contains('has-photo')) {
+                photoArea.querySelector('.photo-placeholder').textContent = '按Ctrl+V粘贴照片';
+            }
+        });
+
+        photoArea.addEventListener('blur', function() {
+            if (!photoArea.classList.contains('has-photo')) {
+                photoArea.querySelector('.photo-placeholder').innerHTML = '点击粘贴<br>照片';
+            }
+        });
+
+        const STORAGE_KEY = 'resume_嵌入式_data_v1';
+        const PHOTO_KEY = 'resume_嵌入式_photo_v1';
+        const FONT_KEY = 'resume_嵌入式_font_v1';
+
+        function getResumeData() {
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            const data = [];
+            editableElements.forEach((el, index) => {
+                data.push({
+                    index: index,
+                    html: el.innerHTML,
+                    isPhoto: el.id === 'photoArea'
+                });
+            });
+            return data;
+        }
+
+        function saveResume() {
+            const data = getResumeData();
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            localStorage.setItem(FONT_KEY, fontScaleSlider.value);
+            const photoImg = photoArea.querySelector('img');
+            if (photoImg) {
+                localStorage.setItem(PHOTO_KEY, photoImg.src);
+            } else {
+                localStorage.removeItem(PHOTO_KEY);
+            }
+            showStatus('✅ 已保存', 'success');
+        }
+
+        function loadResume() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (!saved) {
+                showStatus('⚠️ 无保存数据', 'warning');
+                return;
+            }
+            const data = JSON.parse(saved);
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            data.forEach(item => {
+                if (editableElements[item.index]) {
+                    if (item.isPhoto) {
+                        const photoSrc = localStorage.getItem(PHOTO_KEY);
+                        if (photoSrc) {
+                            editableElements[item.index].innerHTML = '<img src="' + photoSrc + '">';
+                            editableElements[item.index].classList.add('has-photo');
+                        } else {
+                            editableElements[item.index].innerHTML = '<div class="photo-placeholder">点击粘贴<br>照片</div>';
+                            editableElements[item.index].classList.remove('has-photo');
+                        }
+                    } else {
+                        editableElements[item.index].innerHTML = item.html;
+                    }
+                }
+            });
+            // 恢复字体大小
+            const savedFont = localStorage.getItem(FONT_KEY);
+            if (savedFont) {
+                fontScaleSlider.value = savedFont;
+                document.documentElement.style.setProperty('--font-scale', savedFont);
+                fontScaleValue.textContent = Math.round(savedFont * 100) + '%';
+            }
+            checkOverflow();
+            showStatus('✅ 已加载', 'success');
+        }
+
+        function exportHTML() {
+            if (checkOverflow()) {
+                alert('内容已超出A4页面范围，请先删除部分内容再导出！');
+                return;
+            }
+            
+            const clone = document.documentElement.cloneNode(true);
+            const saveBar = clone.querySelector('#saveBar');
+            if (saveBar) saveBar.remove();
+            const tipBanner = clone.querySelector('.tip-banner');
+            if (tipBanner) tipBanner.remove();
+            const overflowWarn = clone.querySelector('#overflowWarning');
+            if (overflowWarn) overflowWarn.remove();
+            const a4Marker = clone.querySelector('#a4HeightMarker');
+            if (a4Marker) a4Marker.remove();
+            const scripts = clone.querySelectorAll('script');
+            scripts.forEach(s => s.remove());
+            const photoImg = document.getElementById('photoArea').querySelector('img');
+            if (photoImg) {
+                const clonePhotoArea = clone.querySelector('#photoArea');
+                if (clonePhotoArea) {
+                    clonePhotoArea.innerHTML = '<img src="' + photoImg.src + '">';
+                    clonePhotoArea.classList.add('has-photo');
+                }
+            }
+            const editables = clone.querySelectorAll('[contenteditable]');
+            editables.forEach(el => el.removeAttribute('contenteditable'));
+            const htmlContent = '<!DOCTYPE html>\n' + clone.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '我的简历.html';
+            a.click();
+            URL.revokeObjectURL(url);
+            showStatus('✅ 已导出HTML', 'success');
+        }
+
+        // 导出PDF
+        async function exportPDF() {
+            if (checkOverflow()) {
+                alert('内容已超出A4页面范围，请先删除部分内容再导出！');
+                return;
+            }
+            
+            showStatus('⏳ 正在生成PDF...', 'warning');
+            
+            try {
+                const { jsPDF } = window.jspdf;
+                const element = document.getElementById('a4Wrapper');
+                
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: element.offsetWidth,
+                    height: element.offsetHeight
+                });
+                
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = pdf.internal.pageSize.getHeight();
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('我的简历.pdf');
+                
+                showStatus('✅ 已导出PDF', 'success');
+            } catch (err) {
+                console.error(err);
+                showStatus('❌ PDF导出失败', 'warning');
+                alert('PDF导出失败，请尝试使用浏览器打印功能（Ctrl+P）');
+            }
+        }
+
+        // 导出PNG
+        async function exportPNG() {
+            if (checkOverflow()) {
+                alert('内容已超出A4页面范围，请先删除部分内容再导出！');
+                return;
+            }
+            
+            showStatus('⏳ 正在生成PNG...', 'warning');
+            
+            try {
+                const element = document.getElementById('a4Wrapper');
+                
+                const canvas = await html2canvas(element, {
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    width: element.offsetWidth,
+                    height: element.offsetHeight
+                });
+                
+                const link = document.createElement('a');
+                link.download = '我的简历.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                showStatus('✅ 已导出PNG', 'success');
+            } catch (err) {
+                console.error(err);
+                showStatus('❌ PNG导出失败', 'warning');
+            }
+        }
+
+        function showStatus(msg, type) {
+            const status = document.getElementById('saveStatus');
+            status.textContent = msg;
+            status.className = 'save-status show ' + type;
+            setTimeout(() => {
+                status.classList.remove('show');
+            }, 3000);
+        }
+
+        let autoSaveTimer;
+        function autoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(() => {
+                saveResume();
+            }, 2000);
+        }
+
+        document.querySelectorAll('[contenteditable="true"]').forEach(el => {
+            if (el.id !== 'photoArea') {
+                el.addEventListener('input', autoSave);
+            }
+        });
+
+        window.addEventListener('load', function() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                loadResume();
+            } else {
+                checkOverflow();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveResume();
+            }
+        });
+    </script>
+</body>
+</html>
